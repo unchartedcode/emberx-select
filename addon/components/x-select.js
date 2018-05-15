@@ -1,9 +1,9 @@
-import Ember from 'ember';
-
-const {
-  isArray,
-  computed,
-} = Ember;
+import { on } from '@ember/object/evented';
+import { once } from '@ember/runloop';
+import { warn } from '@ember/debug';
+import Component from '@ember/component';
+import { isArray, A } from '@ember/array';
+import { computed, observer } from '@ember/object';
 
 const isSelectedOption = (option) => option.$().is(':selected');
 
@@ -26,7 +26,7 @@ const isSelectedOption = (option) => option.$().is(':selected');
  * @class Ember.XSelectComponent
  * @extends Ember.Component
  */
-export default Ember.Component.extend({
+export default Component.extend({
   tagName: "select",
   classNameBindings: [":x-select"],
   attributeBindings: ['disabled', 'tabindex', 'multiple', 'form', 'name', 'autofocus', 'required', 'size', 'title'],
@@ -68,7 +68,7 @@ export default Ember.Component.extend({
    * @property options
    */
   options: computed(function() {
-    return Ember.A([]);
+    return A([]);
   }),
 
   /**
@@ -125,7 +125,7 @@ export default Ember.Component.extend({
     let actionValue = this.get(action);
 
     if(typeof actionValue === 'string') {
-      Ember.warn(`x-select: You must use the action helper for all actions. The try: ${action}=(action "${actionValue}") in your template`, false, {id: 'x-select-string-action'});
+      warn(`x-select: You must use the action helper for all actions. The try: ${action}=(action "${actionValue}") in your template`, false, {id: 'x-select-string-action'});
       return;
     }
 
@@ -139,6 +139,7 @@ export default Ember.Component.extend({
   change(event) {
     let nextValue = this._getValue();
 
+    // eslint-disable-next-line ember/closure-actions
     this.sendAction('action', nextValue, event, this);
     this._handleAction('on-change', nextValue, event);
   },
@@ -210,12 +211,13 @@ export default Ember.Component.extend({
    * @private
    */
   _setDefaultValues: function() {
-    Ember.run.once(this, this.__setDefaultValues);
+    once(this, this.__setDefaultValues);
   },
 
   __setDefaultValues: function() {
     let canSet = !this.isDestroying && !this.isDestroyed;
     if (canSet && this.get('value') == null) {
+      // eslint-disable-next-line ember/closure-actions
       this.sendAction('action', this._getValue());
     }
   },
@@ -253,13 +255,15 @@ export default Ember.Component.extend({
    *
    * @private
    */
-  ensureProperType: Ember.on('init', Ember.observer('value', function() {
+  /* eslint-disable */
+  ensureProperType: on('init', observer('value', function() {
     let value = this.get('value');
 
     if (value != null && this.get('multiple') && !isArray(value)) {
       throw new Error(`x-select multiple=true was set, but value ${value} is not enumerable.`);
     }
   })),
+  /* eslint-enable */
 
   actions: {
 
