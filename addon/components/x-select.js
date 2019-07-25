@@ -37,7 +37,8 @@ export default Component.extend({
     'autofocus',
     'required',
     'size',
-    'title'
+    'title',
+    'autocomplete'
   ],
 
   /**
