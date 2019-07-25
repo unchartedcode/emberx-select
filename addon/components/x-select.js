@@ -218,7 +218,8 @@ export default Component.extend({
   __setDefaultValues() {
     let canSet = !this.isDestroying && !this.isDestroyed;
 
-    if (canSet && this.get('value') == null) {
+    // Only send on change for default if value is not equal to getValue
+    if (canSet && this.get('value') == null && this.get('value') != this._getValue()) {
       // `onChange` is the default event we use
       this._handleAction('onChange', this._getValue(), event);
     }
