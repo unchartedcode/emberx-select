@@ -41,6 +41,15 @@ export default Component.extend({
   ],
 
   /**
+   * The name of the x-option component.
+   *
+   * @property optionComponentName
+   * @type String
+   * @default x-option
+   */
+  optionComponentName: "x-option",
+
+  /**
    * Bound to the `disabled` attribute on the native <select> tag.
    *
    * @property disabled
